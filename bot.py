@@ -4,7 +4,7 @@ import logging
 from datetime import datetime
 import ccxt
 import pandas as pd
-import pandas_ta as ta
+import ta
 import requests
 from dotenv import load_dotenv
 
@@ -90,10 +90,10 @@ def fetch_ohlcv(symbol: str, limit: int = 100) -> pd.DataFrame:
 
 
 def calculate_indicators(df: pd.DataFrame) -> pd.DataFrame:
-    df["rsi"] = ta.rsi(df["close"], length=14)
-    macd_df   = ta.macd(df["close"], fast=MACD_FAST, slow=MACD_SLOW, signal=MACD_SIGNAL)
-    df["macd"]        = macd_df[f"MACD_{MACD_FAST}_{MACD_SLOW}_{MACD_SIGNAL}"]
-    df["macd_signal"] = macd_df[f"MACDs_{MACD_FAST}_{MACD_SLOW}_{MACD_SIGNAL}"]
+    df["rsi"] = ta.momentum.RSIIndicator(df["close"], window=14).rsi()
+    macd = ta.trend.MACD(df["close"], window_fast=MACD_FAST, window_slow=MACD_SLOW, window_sign=MACD_SIGNAL)
+    df["macd"]        = macd.macd()
+    df["macd_signal"] = macd.macd_signal()
     return df.dropna()
 
 
